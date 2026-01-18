@@ -1,40 +1,40 @@
 const pokemonList = [];
 const pokeLimit = 151;
-
-for (let i = 1; i <= pokeLimit; i++) {
-    spawnPokemons(i);
-}
-
-async function spawnPokemons(number, isNew = false) {
-    try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${number}`);
-        const data = await response.json();
-        const item = {
-            id: data.id,
-            name: data.name,
-            photo: data.sprites.front_default,
-            type: data.types[0].type.name
-        };
-        createCards(item, isNew);
-        pokemonList.push(item);
-    } catch (error) {
-        console.error('Error:', error);
+async function initPokemonList(){
+    for (let i = 1; i <= pokeLimit; i++) {
+        let pokemon = await spawnPokemons(i);
+        createCards(pokemon, true);
+        pokemonList.push(pokemon);
     }
 }
+initPokemonList();
 
-function getCard(item) {
+async function spawnPokemons(id, isNew = false) {
+    const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
+    const response = await fetch(url);
+    const data = await response.json();
+    const pokemon = {
+        id: data.id,
+        name: data.name,
+        photo: data.sprites.front_default,
+        type: data.types[0].type.name
+    };
+    return pokemon;
+}
+
+function getCard(pokemon) {
     return `
             <div class="card">
-                <div class="card-title" id="pokeName" style="text-transform: capitalize;">${item.name}</div>
+                <div class="card-title" id="pokeName" style="text-transform: capitalize;">${pokemon.name}</div>
                 <div class="card-img">
-                    <img id="pokePhoto" src="${item.photo}" alt="Pokemon Image" width="200" height="200">
+                    <img id="pokePhoto" src="${pokemon.photo}" alt="Pokemon Image" width="200" height="200">
                 </div>
-                <div class="pill ${item.type}">${item.type}</div>
+                <div class="pill ${pokemon.type}">${pokemon.type}</div>
             </div>`;
 }
 
-function createCards(item, isNew = false) {
-    const cardHtml = getCard(item);
+function createCards(pokemon, isNew = false) {
+    const cardHtml = getCard(pokemon);
     const card = document.createElement('div');
     card.innerHTML = cardHtml;
     const targetContainer = isNew ? document.getElementById("filtered") : document.getElementById('container');
