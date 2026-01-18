@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link href="css/style.css" rel="stylesheet">
+  <script>
+
+    function pokeApiCall() {
+      fetch('https://pokeapi.co/api/v2/pokemon/1')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          //alert(data);
+          let name = data.forms[0].name;
+          //alert(name);
+          document.getElementById("pokeName").textContent = name;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    pokeApiCall()
+  </script>
+</head>
+
+<body>
+  <h1>Pokemon</h1>
+  <span id="pokeName"></span>
+</body>
+
+</html>
