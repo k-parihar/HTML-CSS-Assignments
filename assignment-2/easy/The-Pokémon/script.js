@@ -9,7 +9,7 @@ async function initPokemonList(){
 }
 initPokemonList();
 
-async function spawnPokemons(id, isNew = false) {
+async function spawnPokemons(id) {
     const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
     const response = await fetch(url);
     const data = await response.json();
@@ -33,37 +33,39 @@ function getCard(pokemon) {
             </div>`;
 }
 
-function createCards(pokemon, isNew = false) {
+function createCards(pokemon) {
     const cardHtml = getCard(pokemon);
     const card = document.createElement('div');
     card.innerHTML = cardHtml;
-    const targetContainer = isNew ? document.getElementById("filtered") : document.getElementById('container');
+    const targetContainer = document.getElementById('container');
     targetContainer.appendChild(card);
 }
 
-function showMain(show) {
-    const main = document.getElementById("container").style;
-    main.display = show ? 'flex' : 'none';
-    const filterHtml = document.getElementById("filtered").style;
-    filterHtml.display = !show ? 'flex' : 'none';
-}
-
 function findPokemon() {
-    const filterHtml = document.getElementById("filtered");
-    filterHtml.replaceChildren(); // Clear previous cards
-
     const input = document.getElementById('myInput');
     const search = input.value.toUpperCase();
-    if (!search) {
-        showMain(true);
+    const isExist = pokemonList.some(pokemon => pokemon.id === Number(search) || pokemon.name.toUpperCase() === search);
+    
+    if (isExist) {
+        const cards = document.getElementById('container').getElementsByClassName('card');
+        for (i = 0; i <= cards.length; i++) {
+            var txtValue = cards[i]?.children[0]?.textContent;
+            if(txtValue){
+                const check = txtValue.toUpperCase()?.indexOf(search) > -1 || Number(search) == i;
+                cards[i].style.display = check ? "" : "none";
+            }
+        }
         return;
     }
 
-    showMain(false);
-    const filterList = pokemonList.filter(x => x.name.toUpperCase().includes(search) || x.id == search);
-    filterList.forEach(pokemon => createCards(pokemon, true));
+    createFilteredPokemon(search);
+}
 
-    if (Number.isInteger(Number(search)) && filterList.length === 0) {
-        spawnPokemons(search, true);
+async function createFilteredPokemon(search) {
+    if (pokemonList.some(pokemon => pokemon.id === Number(search))) {
+        return;
     }
+
+    const pokemon = await spawnPokemons(Number(search));
+    createCards(pokemon, true);
 }
