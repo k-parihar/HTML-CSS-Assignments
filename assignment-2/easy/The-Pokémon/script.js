@@ -49,6 +49,9 @@ function showMain(show) {
 }
 
 function findPokemon() {
+    const filterHtml = document.getElementById("filtered");
+    filterHtml.replaceChildren(); // Clear previous cards
+
     const input = document.getElementById('myInput');
     const search = input.value.toUpperCase();
     if (!search) {
@@ -58,15 +61,9 @@ function findPokemon() {
 
     showMain(false);
     const filterList = pokemonList.filter(x => x.name.toUpperCase().includes(search) || x.id == search);
-    filterList.forEach(pokemon => addFilteredCard(pokemon));
+    filterList.forEach(pokemon => createCards(pokemon, true));
 
     if (Number.isInteger(Number(search)) && filterList.length === 0) {
         spawnPokemons(search, true);
     }
-}
-
-function addFilteredCard(pokemon) {
-    const filterHtml = document.getElementById("filtered");
-    filterHtml.replaceChildren(); // Clear previous cards
-    createCards(pokemon, true);
 }
